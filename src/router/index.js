@@ -152,21 +152,90 @@ export const constantRoutes = [
     path: '/major',
     component: Layout,
     redirect: '/major/index',
+    meta: { title: '专业管理', icon: 'form' },
+    children: [
+      {
+        path: 'index',
+        name: 'Table',
+        component: () => import('@/views/major/index'),
+        meta: { title: '专业管理', icon: 'table' }
+      }
+    ]
+  },
+  {
+    path: '/student',
+    component: Layout,
+    redirect: '/student/index',
+    meta: { title: '学生管理', icon: 'form' },
     children: [
       {
         path: 'index',
         name: 'Table',
         component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        meta: { title: '学生管理', icon: 'el-icon-user' }
       }
     ]
   },
+  {
+    path: '/teacher',
+    component: Layout,
+    redirect: '/teacher/index',
+    meta: { title: '教师管理', icon: 'form' },
+    children: [
+      {
+        path: 'index',
+        name: 'Table',
+        component: () => import('@/views/table/index'),
+        meta: { title: '教师管理', icon: 'el-icon-s-custom' }
+      }
+    ]
+  },
+
+  {
+    path: '/leave',
+    component: Layout,
+    redirect: '/leave/index',
+    meta: { title: '请假管理', icon: 'table' },
+    children: [
+      {
+        path: 'index',
+        name: 'Table',
+        component: () => import('@/views/leave/index'),
+        meta: { title: '请假管理', icon: 'el-icon-date' }
+      }
+    ]
+  },
+
+  {
+    path: '/message',
+    component: Layout,
+    redirect: '/message/index',
+    meta: { title: '消息通知提醒', icon: 'el-icon-bell' },
+    children: [
+      {
+        path: 'index',
+        name: 'Table',
+        component: () => import('@/views/message/index'),
+        meta: { title: '消息通知提醒', icon: 'el-icon-bell' }
+      }
+    ]
+  },
+
+  {
+    path: '/feedback',
+    component: Layout,
+    redirect: '/feedback/index',
+    meta: { title: '建议反馈', icon: 'form' },
+    children: [
+      {
+        path: 'index',
+        name: 'Table',
+        component: () => import('@/views/feedback/index'),
+        meta: { title: '建议反馈', icon: 'el-icon-message' }
+      }
+    ]
+  },
+
   // {
   //   path: 'external-link',
   //   component: Layout,

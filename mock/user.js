@@ -1,4 +1,7 @@
 
+/**
+ * token列表
+ */
 const tokens = {
   admin: {
     token: 'admin-token'
@@ -8,6 +11,9 @@ const tokens = {
   }
 }
 
+/**
+ * 用户 'admin-token' 对应所属token
+ */
 const users = {
   'admin-token': {
     roles: ['admin'],
