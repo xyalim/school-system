@@ -1,5 +1,5 @@
 <template>
-  <div class="page" />
+  <div class="page">系统管理员主页</div>
 </template>
 
 <script>
