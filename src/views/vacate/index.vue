@@ -38,22 +38,22 @@
           {{ scope.row.reason }}
         </template>
       </el-table-column>
-      <!-- <el-table-column class-name="status-col" label="申请进度" width="110" align="center">
+      <el-table-column class-name="status-col" label="申请进度" width="110" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status | statusTextFilter }}</el-tag>
         </template>
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column align="center" prop="created_at" label="请假申请时间">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ scope.row.apply_time }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column v-if="roleName !== '学生'" label="申请处理" align="center" prop="created_at">
+      <el-table-column v-if="roleName !== '学生'" label="申请处理" align="center" prop="created_at">
         <template slot-scope="scope">
           <el-button @click="onClickEditApply(scope.row.vacate_id)">编辑</el-button>
         </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -130,6 +130,13 @@ export default {
     async onClickEditApply(vacate_id) {
       const { data, return_msg } = await vacateInfo({ vacate_id })
       console.log(data, return_msg)
+      if (return_msg === 'OK') {
+        const { vacate_id } = data
+        this.$router.push({ path: '/vacate/check', query: {
+          vacate_id
+        }})
+      }
+      debugger
     }
 
   }

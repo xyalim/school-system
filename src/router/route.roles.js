@@ -97,6 +97,13 @@ const rolesRoute = [
         name: 'Table',
         component: () => import('@/views/vacate/post-apply'),
         meta: { title: '请假申请', icon: 'el-icon-date', roles: getRolesIdByName('学生') }
+      },
+      {
+        path: 'check',
+        name: 'check',
+        hidden: true,
+        component: () => import('@/views/vacate/check'),
+        meta: { title: '请假申请', icon: 'el-icon-date', roles: getRolesIdExByName('学生') }
       }
     ]
   },
