@@ -22,6 +22,6 @@ import rolesRoute from './route.roles'
   }
  */
 export default [
-  ...systemRoute,
-  ...rolesRoute
+  ...rolesRoute,
+  ...systemRoute
 ]

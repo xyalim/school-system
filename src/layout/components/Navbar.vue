@@ -16,6 +16,11 @@
               主页
             </el-dropdown-item>
           </router-link>
+          <router-link to="/register">
+            <el-dropdown-item>
+              注册
+            </el-dropdown-item>
+          </router-link>
           <!-- <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>

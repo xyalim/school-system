@@ -1,19 +1,18 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
+    <el-form ref="messageForm" :model="messageForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <div class="title-container">
-        <h3 class="title">高校学生日常管理系统</h3>
+        <h3 class="title">发送信息</h3>
       </div>
 
       <el-form-item prop="username">
-        <span class="svg-container">
+        <!-- <span class="svg-container">
           <svg-icon icon-class="user" />
-        </span>
+        </span> -->
         <el-input
           ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
+          v-model="messageForm.title"
+          placeholder="请输入消息标题"
           name="username"
           type="text"
           tabindex="1"
@@ -21,27 +20,37 @@
         />
       </el-form-item>
 
-      <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
+      <el-form-item prop="user_number">
+        <!-- <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span> -->
         <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="Password"
-          name="password"
-          tabindex="2"
+          ref="user_number"
+          v-model="messageForm.content"
+          placeholder="请输入消息内容"
+          name="user_number"
+          type="textarea"
+          :rows="6"
           auto-complete="on"
-          @keyup.enter.native="onLogin"
         />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-        </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="onLogin">登录</el-button>
+      <el-form-item prop="user_number">
+        <div style="display:flex; aligin-items:center; justify-content:center;">
+          <span class="svg-container">
+            <svg-icon icon-class="user" />
+          </span>
+          <el-select
+            ref="user_number"
+            v-model="messageForm.type"
+            style="width:auto;flex:1"
+            placeholder="请选择发送目标"
+          />
+        </div>
+
+      </el-form-item>
+
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="onSubmit">提交</el-button>
 
       <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
@@ -53,37 +62,26 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-
+import { addFeedback } from '@/api/api'
 export default {
-  name: 'Login',
+  name: 'PostFeedBack',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('请输入正确的账号'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length === 0) {
-        callback(new Error('密码不能为空！'))
-      } else {
-        callback()
-      }
+    const messageForm = {
+      title: '',
+      content: '',
+      // 1所有学生 2所有教师和学生 3单个班级的所有学生 暂未实现
+      type: 1
     }
     return {
-      loginForm: {
-        username: '320221001',
-        password: '123456'
-      },
+      messageForm,
       loginRules: {
-        username: [{ required: true, trigger: 'none', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        title: [{ trigger: 'none', message: '请输入建议标题' }],
+        content: [{ required: true, trigger: 'none', message: '请输入建议内容' }]
+
       },
       loading: false,
-      passwordType: 'password',
       redirect: undefined
+
     }
   },
   watch: {
@@ -95,51 +93,24 @@ export default {
     }
   },
   methods: {
-    showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
-    },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    },
     /**
-     * @description 登录监听
+     * @description 提交监听
      */
-    onLogin() {
-      this.$refs.loginForm.validate(async(valid) => {
+    onSubmit() {
+      this.$refs.messageForm.validate(async(valid) => {
         if (valid) {
           this.loading = true
-          // const res = await login({
-          //   user_number: this.loginForm.username,
-          //   password: this.loginForm.password
-          // })
-          const res = await this.$store.dispatch('user/login', this.loginForm).then((res) => {
-            console.log('login info', res)
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
+          const { return_msg } = await addFeedback({
+            title: this.messageForm.title,
+            content: this.messageForm.content
           }).catch(() => {
             this.loading = false
           })
-          console.log(res)
+
+          if (return_msg === 'OK') {
+            this.$message.success('提交成功')
+          }
+          this.loading = false
         } else {
           console.log('error submit!!')
           this.loading = false
@@ -155,7 +126,7 @@ export default {
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
-$bg:#283443;
+$bg:#fff;
 $light_gray:#fff;
 $cursor: #fff;
 
@@ -170,7 +141,7 @@ $cursor: #fff;
   .el-input {
     display: inline-block;
     height: 47px;
-    width: 85%;
+    width: 98%;
 
     input {
       background: transparent;
@@ -180,6 +151,29 @@ $cursor: #fff;
       padding: 12px 5px 12px 15px;
       color: $light_gray;
       height: 47px;
+      caret-color: $cursor;
+
+      &:-webkit-autofill {
+        box-shadow: 0 0 0px 1000px $bg inset !important;
+        -webkit-text-fill-color: $cursor !important;
+      }
+    }
+
+  }
+
+  .el-textarea{
+    display: inline-block;
+    min-height: 150px;
+    width: 100%;
+
+    textarea {
+      background: transparent;
+      border: 0px;
+      -webkit-appearance: none;
+      border-radius: 0px;
+      padding: 12px 5px 12px 15px;
+      color: $light_gray;
+      // height: 47px;
       caret-color: $cursor;
 
       &:-webkit-autofill {
@@ -205,6 +199,7 @@ $light_gray:#eee;
 
 .login-container {
   min-height: 100%;
+  height: calc(100vh - 50px);
   width: 100%;
   background-color: $bg;
   overflow: hidden;
@@ -213,7 +208,7 @@ $light_gray:#eee;
     position: relative;
     width: 520px;
     max-width: 100%;
-    padding: 160px 35px 0;
+    padding: 60px 35px 0;
     margin: 0 auto;
     overflow: hidden;
   }

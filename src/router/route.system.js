@@ -2,10 +2,16 @@
 /* Layout */
 import Layout from '@/layout'
 
-export default [
+const systemRoute = [
   {
     path: '/login',
     component: () => import('@/views/login/index'),
+    hidden: true
+  },
+
+  {
+    path: '/register',
+    component: () => import('@/views/register/index'),
     hidden: true
   },
 
@@ -120,4 +126,15 @@ export default [
       }
     ]
   }
+
 ]
+systemRoute.forEach(ele => {
+  if (ele.meta) {
+    ele.meta.pageType = 'system'
+  } else {
+    ele.meta = {
+      pageType: 'system'
+    }
+  }
+})
+export default systemRoute

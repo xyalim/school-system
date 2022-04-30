@@ -1,12 +1,15 @@
-import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import { login, getUserInfo } from '@/api/api'
+import { Message } from 'element-ui'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+    userInfo: null,
+    role: ''
   }
 }
 
@@ -24,57 +27,71 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_USERINFO: (state, userInfo) => {
+    state.userInfo = userInfo
   }
+
 }
 
 const actions = {
-  // user login
+
+  /**
+   * @description 用户登录
+   */
   login({ commit }, userInfo) {
     const { username, password } = userInfo
-    return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
+    return login({
+      user_number: username,
+      password: password
+    }).then((response, reject) => {
+      const { data, return_msg } = response
+      console.log(response)
+      if (return_msg === 'OK') {
+        commit('SET_TOKEN', data['x-token'])
+        setToken(data['x-token'])
+
+        Message({
+          message: '登录成功',
+          type: 'success',
+          duration: 5 * 1000
+        })
+        return response
+      } else {
+        reject(response)
+      }
     })
   },
 
-  // get user info
-  getInfo({ commit, state }) {
-    return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
-
-        if (!data) {
-          return reject('Verification failed, please Login again.')
-        }
-
-        const { name, avatar } = data
-
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        resolve(data)
-      }).catch(error => {
-        reject(error)
+  /**
+   * @description 获取用户信息
+   */
+  async getUserInfo({ commit }) {
+    const { return_msg, data } = await getUserInfo()
+      .catch((err) => {
+        console.log(err)
+        Message({ type: 'error', message: err })
+        commit('SET_USERINFO', null)
+        return null
       })
-    })
+
+    if (return_msg === 'OK') {
+      commit('SET_USERINFO', data)
+      return data
+    } else {
+      commit('SET_USERINFO', null)
+    }
   },
 
   // user logout
-  logout({ commit, state }) {
-    return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        removeToken() // must remove  token  first
-        resetRouter()
-        commit('RESET_STATE')
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
+  logout({ commit }) {
+    removeToken() // must remove  token  first
+    resetRouter()
+    commit('RESET_STATE')
+    Message({
+      message: '退出成功',
+      type: 'success',
+      duration: 5 * 1000
     })
   },
 
@@ -86,6 +103,7 @@ const actions = {
       resolve()
     })
   }
+
 }
 
 export default {

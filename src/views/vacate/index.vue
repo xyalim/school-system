@@ -45,6 +45,7 @@
 
 <script>
 import { getList } from '@/api/table'
+import { vacateList } from '@/api/api/vacate'
 
 export default {
   filters: {
@@ -73,6 +74,13 @@ export default {
         this.list = response.data.items
         this.listLoading = false
       })
+    },
+    /**
+     * @description 查询请假列表
+     */
+    async vacateList() {
+      const res = await vacateList()
+      console.log(res)
     }
   }
 }
