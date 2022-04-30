@@ -13,19 +13,19 @@
           {{ scope.$index + 1 }}
         </template>
       </el-table-column>
-      <el-table-column label="标题" width="300">
+      <el-table-column label="消息标题" width="300">
         <template slot-scope="scope">
-          {{ scope.row.feedback_title }}
+          {{ scope.row.message_title }}
         </template>
       </el-table-column>
-      <el-table-column label="提交者ID" width="110" align="center">
+      <el-table-column label="发送者ID" width="110" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.user_id }}</span>
+          <span>{{ scope.row.user_id_sender }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="意见内容" align="center">
+      <el-table-column label="消息内容" align="center">
         <template slot-scope="scope">
-          {{ scope.row.feedback_content }}
+          {{ scope.row.message_content }}
         </template>
       </el-table-column>
       <!-- <el-table-column class-name="status-col" label="Status" width="110" align="center">
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { FeedbackList } from '@/api/api'
+import { messageList } from '@/api/api'
 
 export default {
   filters: {
@@ -69,8 +69,7 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      const { data } = await FeedbackList()
-      console.log(data)
+      const { data } = await messageList()
       this.list = data
       this.listLoading = false
     }

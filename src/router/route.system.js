@@ -30,7 +30,8 @@ const systemRoute = [
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
-    }]
+    }],
+    hidden: true
   },
 
   {
@@ -38,6 +39,7 @@ const systemRoute = [
     component: Layout,
     redirect: '/example/table',
     name: 'Example',
+    hidden: true,
     meta: { title: 'Example', icon: 'el-icon-s-help' },
     children: [
       {
@@ -65,7 +67,8 @@ const systemRoute = [
         component: () => import('@/views/form/index'),
         meta: { title: 'Form', icon: 'form' }
       }
-    ]
+    ],
+    hidden: true
   },
 
   {
@@ -77,6 +80,7 @@ const systemRoute = [
       title: 'Nested',
       icon: 'nested'
     },
+    hidden: true,
     children: [
       {
         path: 'menu1',

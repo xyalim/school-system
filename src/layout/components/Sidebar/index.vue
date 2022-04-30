@@ -12,7 +12,10 @@
         :collapse-transition="false"
         mode="vertical"
       >
-        <sidebar-item v-for="route in routes" :key="route.path" :item="route" :base-path="route.path" />
+        <template v-for="route in routes">
+          <sidebar-item v-if="showItemReg(route)" :key="route.path" :item="route" :base-path="route.path" />
+        </template>
+
       </el-menu>
     </el-scrollbar>
   </div>
@@ -28,7 +31,8 @@ export default {
   components: { SidebarItem, Logo },
   computed: {
     ...mapGetters([
-      'sidebar'
+      'sidebar',
+      'roleName'
     ]),
     routes() {
       console.log(this.$router.options)
@@ -51,6 +55,13 @@ export default {
     },
     isCollapse() {
       return !this.sidebar.opened
+    }
+
+  },
+  methods: {
+    showItemReg(route) {
+      // debugger
+      return true
     }
   }
 }

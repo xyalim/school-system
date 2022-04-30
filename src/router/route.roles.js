@@ -38,53 +38,65 @@ const rolesRoute = [
     ]
   },
 
+  // {
+  //   path: '/manage',
+  //   component: Layout,
+  //   redirect: '/index',
+  //   meta: { title: '角色管理', icon: 'form' },
+  //   children: [
+  //     {
+  //       path: 'student',
+  //       name: 'Table',
+  //       component: () => import('@/views/table/index'),
+  //       meta: { title: '学生管理', icon: 'el-icon-user' }
+  //     },
+  //     {
+  //       path: 'teacher',
+  //       name: 'Table',
+  //       component: () => import('@/views/table/index'),
+  //       meta: { title: '教师管理', icon: 'el-icon-s-custom' }
+  //     }
+  //   ]
+  // },
+
   {
-    path: '/manage',
+    path: '/schedule',
     component: Layout,
-    redirect: '/index',
-    meta: { title: '角色管理', icon: 'form' },
+    redirect: '/student',
+    hidden: true,
+    meta: { title: '课程管理', icon: 'form' },
     children: [
       {
         path: 'student',
         name: 'Table',
         component: () => import('@/views/table/index'),
-        meta: { title: '学生管理', icon: 'el-icon-user' }
+        meta: { title: '学生课程表', icon: 'el-icon-user' }
       },
       {
         path: 'teacher',
         name: 'Table',
         component: () => import('@/views/table/index'),
-        meta: { title: '教师管理', icon: 'el-icon-s-custom' }
+        meta: { title: '老师排课表', icon: 'el-icon-s-custom' }
       }
     ]
   },
+
   {
     path: '/vacate',
     component: Layout,
-    redirect: '/vacate/index',
-    meta: { title: '请假管理', icon: 'table' },
+    meta: { title: '请假管理', icon: 'el-icon-date' },
     children: [
       {
         path: 'index',
         name: 'Table',
         component: () => import('@/views/vacate/index'),
-        meta: { title: '请假管理', icon: 'el-icon-date' },
-        children: [
-          {
-            path: 'index3',
-            name: 'Table',
-            component: () => import('@/views/major/index'),
-            meta: { title: '专业管理-学生能看', icon: 'table', roles: getRolesIdExByName('学生') },
-            children: [
-              {
-                path: 'index4',
-                name: 'Table',
-                component: () => import('@/views/major/index'),
-                meta: { title: '专业管理-学生能看', icon: 'table' }
-              }
-            ]
-          }
-        ]
+        meta: { title: '请假列表', icon: 'el-icon-date' }
+      },
+      {
+        path: 'post-apply',
+        name: 'Table',
+        component: () => import('@/views/vacate/post-apply'),
+        meta: { title: '请假申请', icon: 'el-icon-date', roles: getRolesIdByName('学生') }
       }
     ]
   },
@@ -105,7 +117,7 @@ const rolesRoute = [
         path: 'post-message',
         name: 'Table',
         component: () => import('@/views/message/post-message'),
-        meta: { title: '发送消息', icon: 'el-icon-bell' }
+        meta: { title: '发送消息', icon: 'el-icon-bell', roles: getRolesIdByName('系统管理员', '教学管理员') }
       }
     ]
   },
@@ -120,13 +132,13 @@ const rolesRoute = [
         path: 'index',
         name: 'Table',
         component: () => import('@/views/feedback/index'),
-        meta: { title: '建议列表', icon: 'el-icon-message' }
+        meta: { title: '建议列表', icon: 'form', roles: getRolesIdByName('系统管理员', '教学管理员') }
       },
       {
         path: 'post-feed-back',
         name: 'Table',
         component: () => import('@/views/feedback/post-feed-back'),
-        meta: { title: '提交建议', icon: 'el-icon-message' }
+        meta: { title: '提交建议', icon: 'form' }
       }
     ]
   }

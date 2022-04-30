@@ -32,10 +32,10 @@ export function messageDetail(params) {
  * @param {string} message_title
  * @param {string} message_content
  */
-export function sendMessage(params) {
+export function sendMessage(data) {
   return request({
     url: `${prefix}/sendMessage`,
     method: 'post',
-    params
+    data
   })
 }

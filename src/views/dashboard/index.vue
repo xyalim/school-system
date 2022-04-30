@@ -1,7 +1,8 @@
 <template>
   <div class="dashboard-container">
     <div class="dashboard-text">高校学生日常管理系统</div>
-    <div class="dashboard-text">欢迎回来: {{ roleName }} {{ name }}</div>
+    <div class="dashboard-text">欢迎回来: {{ name }}</div>
+    <div class="dashboard-text">您当前的身份是: {{ roleName }}</div>
   </div>
 </template>
 

@@ -1,36 +1,45 @@
 <template>
   <div class="login-container">
-    <el-form ref="feedbackForm" :model="feedbackForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+    <el-form ref="vacateApplyForm" :model="vacateApplyForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <div class="title-container">
-        <h3 class="title">提交建议</h3>
+        <h3 class="title">请假申请</h3>
       </div>
 
-      <el-form-item prop="username">
-        <!-- <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span> -->
-        <el-input
-          ref="username"
-          v-model="feedbackForm.title"
-          placeholder="请输入建议标题"
-          name="username"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
+      <el-form-item prop="schedule_id">
+        <!-- <el-select
+          v-model="vacateApplyForm.schedule_id"
+          style="width:100%"
+          placeholder="请选择请假课程"
+          no-data-text="暂无数据"
+        >
+          <el-option
+            v-for="item in scheduleStudentList"
+            :key="item.class_id"
+            :label="item.course_name"
+            :value="item.class_id"
+            style="width:100%"
+          />
+        </el-select> -->
+        <el-cascader
+          v-model="vacateApplyForm.schedule_id"
+          :options="scheduleStudentList"
+          :props="scheduleProps"
+          placeholder="请选择需要请假的课程"
+          style="width:100%;"
+          :multiple="false"
+          @change="onChangeSchedule"
         />
+
       </el-form-item>
 
-      <el-form-item prop="user_number">
-        <!-- <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span> -->
+      <el-form-item prop="content">
         <el-input
-          ref="user_number"
-          v-model="feedbackForm.content"
-          placeholder="请输入您对学校以及本网站系统的建议吧 ^_^"
+          ref="content"
+          v-model="vacateApplyForm.content"
+          placeholder="请输入请假原因"
           name="user_number"
           type="textarea"
-          :rows="12"
+          :rows="6"
           auto-complete="on"
         />
       </el-form-item>
@@ -47,24 +56,32 @@
 </template>
 
 <script>
-import { addFeedback } from '@/api/api'
+import { apply, scheduleStudentList } from '@/api/api'
 export default {
   name: 'PostFeedBack',
   data() {
-    const feedbackForm = {
-      title: '',
-      content: ''
+    const vacateApplyForm = {
+      // 课程id
+      schedule_id: '',
+      reason: ''
     }
     return {
-      feedbackForm,
+      vacateApplyForm,
       loginRules: {
-        title: [{ trigger: 'none', message: '请输入建议标题' }],
-        content: [{ required: true, trigger: 'none', message: '请输入建议内容' }]
-
+        title: [{ required: true, trigger: 'blur', message: '请输入建议标题' }],
+        content: [{ required: true, trigger: 'none', message: '请输入建议内容' }],
+        type: [{ required: true, trigger: 'none', message: '请选择发送目标' }]
       },
-      loading: false,
-      redirect: undefined
 
+      // 学生课程表
+      scheduleStudentList: [],
+      loading: false,
+      redirect: undefined,
+      scheduleProps: {
+        label: 'label',
+        children: 'children',
+        value: 'schedule_id'
+      }
     }
   },
   watch: {
@@ -75,17 +92,20 @@ export default {
       immediate: true
     }
   },
+  created() {
+    this.getScheduleStudentList()
+  },
   methods: {
     /**
      * @description 提交监听
      */
     onSubmit() {
-      this.$refs.feedbackForm.validate(async(valid) => {
+      this.$refs.vacateApplyForm.validate(async(valid) => {
         if (valid) {
           this.loading = true
-          const { return_msg } = await addFeedback({
-            title: this.feedbackForm.title,
-            content: this.feedbackForm.content
+          const { return_msg } = await apply({
+            schedule_id: this.vacateApplyForm.schedule_id[1],
+            reason: this.vacateApplyForm.content
           }).catch(() => {
             this.loading = false
           })
@@ -95,12 +115,61 @@ export default {
           }
           this.loading = false
         } else {
-          console.log('error submit!!')
           this.loading = false
           return false
         }
       })
+    },
+    /**
+     * @description 获取课程列表
+     */
+    async getScheduleStudentList() {
+      const { data, return_msg } = await scheduleStudentList()
+
+      if (return_msg === 'OK') {
+        const selectList = []
+
+        // 过滤相同的年月日
+        data.forEach(scheduleItem => {
+          const [dateYMD, dateHMS] = scheduleItem.start_time.split(' ')
+          scheduleItem.dateYMD = dateYMD
+          scheduleItem.dateHMS = dateHMS
+
+          const findItemIndex = selectList.findIndex(selectItem => {
+            const [selDateYMD, selDateHMS] = selectItem.start_time.split(' ')
+            selectItem.dateYMD = selDateYMD
+            selectItem.dateHMS = selDateHMS
+
+            if (selDateYMD === dateYMD) {
+              return true
+            } else {
+              return false
+            }
+          })
+
+          const childLabel = `${scheduleItem.dateHMS}-${scheduleItem.end_time.split(' ')[1]} ${scheduleItem.course_name}`
+          // 孩子节点
+          if (findItemIndex !== -1) {
+            scheduleItem.label = childLabel
+            selectList[findItemIndex].children.push({ ...scheduleItem })
+          } else {
+            // 顶层节点
+            scheduleItem.label = scheduleItem.dateYMD
+            if (!scheduleItem.children) {
+              scheduleItem.children = []
+              scheduleItem.children[0] = { ...scheduleItem, label: childLabel, children: undefined }
+            }
+            selectList.push({ ...scheduleItem })
+          }
+        })
+        this.scheduleStudentList = selectList
+      }
+    },
+
+    onChangeSchedule() {
+
     }
+
   }
 }
 </script>
@@ -141,11 +210,12 @@ $cursor: #fff;
         -webkit-text-fill-color: $cursor !important;
       }
     }
+
   }
 
   ::v-deep .el-textarea{
     display: inline-block;
-    min-height: 280px;
+    min-height: 150px;
     width: 100%;
 
     textarea {
@@ -184,13 +254,13 @@ $light_gray:#eee;
   height: calc(100vh - 50px);
   width: 100%;
   background-color: $bg;
-  overflow: hidden;
+  overflow-y: scroll;
 
   .login-form {
     position: relative;
-    width: 520px;
+    width: 80%;
     max-width: 100%;
-    padding: 60px 35px 0;
+    padding: 30px 35px 0;
     margin: 0 auto;
     overflow: hidden;
   }

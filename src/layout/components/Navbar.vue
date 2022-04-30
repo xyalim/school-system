@@ -4,7 +4,10 @@
 
     <breadcrumb class="breadcrumb-container" />
 
-    <div class="right-menu">
+    <div class="right-menu" style="display:inline-flex">
+      <span style="display:inline-block; margin-right:20px;">
+        用户身份:{{ roleName }} 用户名:{{ name }}
+      </span>
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
@@ -16,7 +19,7 @@
               主页
             </el-dropdown-item>
           </router-link>
-          <router-link to="/register">
+          <router-link v-if="!(roleName === '学生' || roleName === '老师')" to="/register">
             <el-dropdown-item>
               注册
             </el-dropdown-item>
@@ -49,7 +52,9 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
+      'avatar',
+      'roleName',
+      'name'
     ])
   },
   methods: {

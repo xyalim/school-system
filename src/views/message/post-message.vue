@@ -5,10 +5,7 @@
         <h3 class="title">发送信息</h3>
       </div>
 
-      <el-form-item prop="username">
-        <!-- <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span> -->
+      <el-form-item prop="title">
         <el-input
           ref="username"
           v-model="messageForm.title"
@@ -25,7 +22,7 @@
           <svg-icon icon-class="user" />
         </span> -->
         <el-input
-          ref="user_number"
+          ref="content"
           v-model="messageForm.content"
           placeholder="请输入消息内容"
           name="user_number"
@@ -35,17 +32,25 @@
         />
       </el-form-item>
 
-      <el-form-item prop="user_number">
+      <el-form-item prop="type">
         <div style="display:flex; aligin-items:center; justify-content:center;">
-          <span class="svg-container">
-            <svg-icon icon-class="user" />
+          <span style="flex:1;" class="svg-container">
+            <!-- <svg-icon icon-class="user" /> -->
+            发送目标
           </span>
           <el-select
             ref="user_number"
             v-model="messageForm.type"
             style="width:auto;flex:1"
             placeholder="请选择发送目标"
-          />
+          >
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
         </div>
 
       </el-form-item>
@@ -62,7 +67,7 @@
 </template>
 
 <script>
-import { addFeedback } from '@/api/api'
+import { sendMessage } from '@/api/api'
 export default {
   name: 'PostFeedBack',
   data() {
@@ -75,10 +80,18 @@ export default {
     return {
       messageForm,
       loginRules: {
-        title: [{ trigger: 'none', message: '请输入建议标题' }],
-        content: [{ required: true, trigger: 'none', message: '请输入建议内容' }]
-
+        title: [{ required: true, trigger: 'blur', message: '请输入建议标题' }],
+        content: [{ required: true, trigger: 'none', message: '请输入建议内容' }],
+        type: [{ required: true, trigger: 'none', message: '请选择发送目标' }]
       },
+
+      options: [{
+        value: 1,
+        label: '所有学生'
+      }, {
+        value: 2,
+        label: '所有教师和学生'
+      }],
       loading: false,
       redirect: undefined
 
@@ -100,9 +113,10 @@ export default {
       this.$refs.messageForm.validate(async(valid) => {
         if (valid) {
           this.loading = true
-          const { return_msg } = await addFeedback({
-            title: this.messageForm.title,
-            content: this.messageForm.content
+          const { return_msg } = await sendMessage({
+            message_title: this.messageForm.title,
+            message_content: this.messageForm.content,
+            type: this.messageForm.type
           }).catch(() => {
             this.loading = false
           })
@@ -112,7 +126,6 @@ export default {
           }
           this.loading = false
         } else {
-          console.log('error submit!!')
           this.loading = false
           return false
         }
@@ -122,7 +135,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
@@ -138,7 +151,7 @@ $cursor: #fff;
 
 /* reset element-ui css */
 .login-container {
-  .el-input {
+  ::v-deep .el-input {
     display: inline-block;
     height: 47px;
     width: 98%;
@@ -161,7 +174,7 @@ $cursor: #fff;
 
   }
 
-  .el-textarea{
+  ::v-deep .el-textarea{
     display: inline-block;
     min-height: 150px;
     width: 100%;
@@ -208,7 +221,7 @@ $light_gray:#eee;
     position: relative;
     width: 520px;
     max-width: 100%;
-    padding: 60px 35px 0;
+    padding: 30px 35px 0;
     margin: 0 auto;
     overflow: hidden;
   }

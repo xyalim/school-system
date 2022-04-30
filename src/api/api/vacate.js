@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const prefix = '/feedback'
+const prefix = '/vacate'
 
 /**
  * @description 学生申请请假
